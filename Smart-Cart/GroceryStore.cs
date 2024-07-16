@@ -18,7 +18,7 @@ namespace Smart_Cart
 
             foreach (Product item in food)
             {
-                Console.WriteLine($"Product: {item.Name} \t Price: {item.Price}");
+                Console.WriteLine($"Product: {item.Name}\tPrice: {item.Price}");
             }
         }
 

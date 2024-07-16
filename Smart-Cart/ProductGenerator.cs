@@ -1,84 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
+using static Smart_Cart.Product;
 
 namespace Smart_Cart
 {
     public class ProductGenerator
     {
-        private List<string> clothingProducts = new List<string>
+        List<string> clothingProducts = new List<string>
         {
-            "T-Shirt", "Jeans", "Jacket", "Sweater", "Dress",
-            "Shorts", "Skirt", "Blouse", "Socks", "Hat"
+            "T-Shirt",
+            "Jeans",
+            "Jacket",
+            "Sweater",
+            "Dress",
+            "Shorts",
+            "Skirt",
+            "Blouse",
+            "Socks",
+            "Hat"
         };
 
-        private List<string> groceryProducts = new List<string>
+        List<string> groceryProducts = new List<string>
         {
-            "Apple", "Orange", "Bread", "Chicken", "Milk",
-            "Cheese", "Rice", "Pasta", "Yogurt", "Potato"
+            "Apple",
+            "Orange",
+            "Bread",
+            "Chicken",
+            "Milk",
+            "Cheese",
+            "Rice",
+            "Pasta",
+            "Yogurt",
+            "Potato"
         };
 
-        private List<decimal> prices = new List<decimal>
+        List<decimal> prices = new List<decimal>
         {
-            // Prices for food items
-            1.49m, 1.99m, 2.49m, 7.99m, 3.49m,
-
-            // Prices for clothing items
-            19.99m, 49.99m, 89.99m, 39.99m, 59.99m
+            1.49m, 
+            1.99m, 
+            2.49m, 
+            7.99m, 
+            3.49m, //till here are food prices
+            19.99m, 
+            49.99m, 
+            89.99m, 
+            39.99m, 
+            59.99m, 
         };
 
-        private Random rand = new Random();
+        HashSet<string> food_names;
+        HashSet<string> clothes_names ;
 
-        // Helper method to generate unique random indices
-        private List<int> GetUniqueRandomIndices(int count, int max)
-        {
-            return Enumerable.Range(0, max).OrderBy(x => rand.Next()).Take(count).ToList();
-        }
+        HashSet<Product> clothing = new HashSet<Product>();
+        HashSet<Product> food = new HashSet<Product>();
+
+        Random rand = new Random();
+
 
         public (HashSet<Product> clothing, HashSet<Product> food) GenerateProduct()
         {
-            HashSet<Product> clothingSet = new HashSet<Product>();
-            HashSet<Product> foodSet = new HashSet<Product>();
+           food_names = new HashSet<string>();
+           clothes_names = new HashSet<string>();
 
-            // Get unique random indices for clothing and food products
-            List<int> clothingIndices = GetUniqueRandomIndices(5, clothingProducts.Count);
-            List<int> foodIndices = GetUniqueRandomIndices(5, groceryProducts.Count);
-            List<int> clothingPriceIndices = GetUniqueRandomIndices(5, prices.Count - 5).Select(x => x + 5).ToList(); // Adjust for clothing price indices
-            List<int> foodPriceIndices = GetUniqueRandomIndices(5, 5); // First 5 for food prices
-
-            // Generate unique clothing products
-            for (int i = 0; i < 5; i++)
+      
+            while (food_names.Count < 5)
             {
-                string productName = clothingProducts[clothingIndices[i]];
-                decimal productPrice = prices[clothingPriceIndices[i]];
-
-                Product newClothing = new Product()
-                {
-                    Name = productName,
-                    Price = productPrice,
-                    Category = Product.ProductCategory.Clothing
-                };
-
-                clothingSet.Add(newClothing);
+                if (!food_names.Contains(groceryProducts[rand.Next(groceryProducts.Count)])){
+                    food_names.Add(groceryProducts[rand.Next(groceryProducts.Count)]);
+                }
+                
             }
 
-            // Generate unique food products
-            for (int i = 0; i < 5; i++)
+            while (clothes_names.Count < 5)
             {
-                string productName = groceryProducts[foodIndices[i]];
-                decimal productPrice = prices[foodPriceIndices[i]];
-
-                Product newFood = new Product()
+                if (!clothes_names.Contains(clothingProducts[rand.Next(clothingProducts.Count)]))
                 {
-                    Name = productName,
-                    Price = productPrice,
-                    Category = Product.ProductCategory.Food
-                };
-
-                foodSet.Add(newFood);
+                    clothes_names.Add(clothingProducts[rand.Next(clothingProducts.Count)]);
+                }
             }
 
-            return (clothingSet, foodSet);
+
+            foreach (var food_name in food_names)
+            {
+                if (food.Count < 5)
+                {
+                    food.Add(new Product
+                    {
+                        Name = food_name,
+                        Price = prices[rand.Next(0, 5)],
+                        Category = Product.ProductCategory.Food
+                    });
+                }
+                   
+                
+                
+            }
+
+            foreach (var clothes_name in clothes_names)
+            {
+                if (clothing.Count < 5)
+                {
+                    clothing.Add(new Product
+                    {
+                        Name = clothes_name,
+                        Price = prices[rand.Next(5, prices.Count)],
+                        Category = Product.ProductCategory.Clothing
+                    });
+                }
+                
+            }
+
+            return (clothing, food);
         }
+
+         
+
+
     }
 }
